@@ -1,5 +1,6 @@
 import re
 
+# Task 1: Chronicles of Narnia
 def chronicles_of_narnia(filename):
 
     books = {} # dict to be returned
@@ -97,5 +98,63 @@ def chronicles_of_narnia(filename):
     return books
 
 # Test for Task 1: Chronicles of Narnia
-task_1 = chronicles_of_narnia('/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/chronicles_of_narnia.txt')
-print(task_1)
+# task_1 = chronicles_of_narnia('/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/chronicles_of_narnia.txt')
+# print(task_1)
+
+# Task 2: Regular Expressions
+def regular_expressions(string):
+    # Returns email, date, url, cite, or None
+
+    # Email
+    # Must start & end with letter or number (^[])
+    # Optional: contains letters, numbers, ., _, - ()?
+    # @
+    # Must start & end with letter or number (^[])
+    # Optional: contains letters, numbers, ., _, - ()?
+    # \.
+    # Ends with com, org, edu, or gov
+
+    email_identify = re.compile(r'^[A-Za-z0-9]([\w.-]*[A-Za-z0-9])?@[A-Za-z0-9]([\w.-]*[A-Za-z0-9])?\.(com|org|edu|gov)$')
+
+    # Date
+    # Format YYYY/MM/DD, YY/MM/DD, YYYY-MM-DD, YY-MM-DD
+    # Year: 1951-2050 or 00-99
+    # Month: (0)?1-12
+    # Day: (0)?1-31 (need to check if day is in month)
+
+    date_identify = re.compile(r'^((19[5-9][0-9]|20[0-4][0-9]|2050)|([5-9][0-9]|[0-4][0-9]|50))' # year
+                               r'[/-]((0?[13578]|1[02])[/-](0?[1-9]|[12][0-9]|3[01])|' # mm-dd for months with 31 days
+                               r'((0?[469]|11)[/-](0?[1-9]|[12][0-9]|30))|' # mm-dd for months with 30 days max
+                               r'(0?2[/-](0?[1-9]|[12][0-9])))$') # mm-dd for February
+
+    # url
+    # http or https
+    # ://
+    # Must start with letter/number
+    # Must include at least one dot
+    # Optional: contain letters, -, .
+
+    url_identify = re.compile(r'^(https?)://[A-Za-z0-9][A-Za-z.-]*\.[A-Za-z-.]*$')
+
+    # cite
+    # Single author Lastname, YYYY (authors with two-word last names or multiple capital letters ex. McGowan)
+    # Two authors Lastname and Lastname, YYYY
+    # Lastname et al., YYYY
+
+    cite_identify = re.compile(r'^[A-Z][a-zA-Z]*([A-Z][a-zA-Z]*)*( and [A-Z][a-zA-Z]*([A-Z][a-zA-Z]*)*)?( et al\.)?, (19[0-9][0-9]|20[01][0-9]|202[0-4])$')
+
+    if email_identify.match(string):
+        return 'email'
+    elif date_identify.match(string):
+        return 'date'
+    elif url_identify.match(string):
+        return 'url'
+    elif cite_identify.match(string):
+        return 'cite'
+    else:
+        return None
+
+# Test for Task 2: Regular Expressions
+# test = ['esther.fu@emory.edu', 'email@domain.abc', 'username@hostname.gov', '1958/1/2', '2024-2-31', 'https://testweb.com', 'Smith, 2023', 'Smith and Jones, 2023', 'Smith et al., 2023']
+# for t in test:
+    # print(regular_expressions(t))
