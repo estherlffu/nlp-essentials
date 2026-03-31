@@ -55,12 +55,12 @@ def knn(trn_vs: list[tuple[int, SparseVector]], v: SparseVector, k: int = 1) -> 
     sims = [(label, cosine_similarity(v, t)) for label, t in trn_vs]
     sims.sort(key=lambda x: x[1], reverse=True)
     predicted_label = Counter(label for label, _ in sims[:k]).most_common(1)[0][0]
-    top_sim = sim[0][1]
+    top_sim = sims[0][1]
     return predicted_label, top_sim
 
 def sentiment_analyzer(train_docs, test_docs):
 
-    k = 7 # NEED TO HARDCODE TO BEST VALUE
+    k = 37 # accuracy: 0.3915
 
     train_labels = [label for label, _ in train_docs]
     train_tokens = [tokens for _, tokens in train_docs]
@@ -81,3 +81,22 @@ def sentiment_analyzer(train_docs, test_docs):
     return [knn(train_vectors, v, k) for v in test_vectors]
 
 # Finding optimal k
+'''
+def evaluate_predictions(predictions, test_docs):
+    test = [label for label, _ in test_docs]
+    pred = [label for label, _ in predictions]
+
+    correct = sum(g == p for g, p in zip(test, pred))
+    accuracy = correct / len(test)
+
+    return accuracy
+
+train_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_trn.tsv")
+test_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_dev.tsv")
+
+for k in range(20,41):
+    predictions = sentiment_analyzer(train_docs, test_docs, k=k)
+    accuracy = evaluate_predictions(predictions, test_docs)
+    print(f"k={k}: accuracy={accuracy:.4f}")
+
+'''
