@@ -179,7 +179,7 @@ def evaluate_predictions(predictions, test_docs):
     accuracy = correct / len(test)
 
     return accuracy
-
+ 
 train_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_trn.tsv")
 test_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_dev.tsv")
 
