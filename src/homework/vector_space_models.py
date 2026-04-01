@@ -126,9 +126,9 @@ def knn_extra(trn_vs: list[tuple[int, SparseVector]], v: SparseVector, k: int = 
 
     return predicted_label, top_sim
 
-def sentiment_analyzer_extra(train_docs: list[tuple[int,Document]], test_docs: list[tuple[int,Document]], k) -> list[tuple[int,float]]:
+def sentiment_analyzer_extra(train_docs: list[tuple[int,Document]], test_docs: list[tuple[int,Document]]) -> list[tuple[int,float]]:
 
-    #k = 117 # accuracy: 0.4042
+    k = 117
 
     # Add stopwords
     stopwords = {line.strip().lower() for line in open('/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/stopwords.txt')}
@@ -171,11 +171,23 @@ def sentiment_analyzer_extra(train_docs: list[tuple[int,Document]], test_docs: l
 
 '''
 # Evaluate improved sentiment analyzer
+def evaluate_predictions(predictions, test_docs):
+    test = [label for label, _ in test_docs]
+    pred = [label for label, _ in predictions]
+
+    correct = sum(g == p for g, p in zip(test, pred))
+    accuracy = correct / len(test)
+
+    return accuracy
 
 train_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_trn.tsv")
 test_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_dev.tsv")
 
-for k in range(116,119):
+predictions = sentiment_analyzer_extra(train_docs, test_docs)
+accuracy = evaluate_predictions(predictions, test_docs)
+print(accuracy)
+
+for k in range(30,36):
     predictions = sentiment_analyzer_extra(train_docs, test_docs, k=k)
     accuracy = evaluate_predictions(predictions, test_docs)
     print(f"k={k}: accuracy={accuracy:.4f}")
