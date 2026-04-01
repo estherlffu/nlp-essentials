@@ -60,7 +60,7 @@ def knn(trn_vs: list[tuple[int, SparseVector]], v: SparseVector, k: int = 1) -> 
 
 def sentiment_analyzer(train_docs, test_docs):
 
-    k = 37 # accuracy: 0.3915
+    k = 117 # accuracy: 0.4042
 
     train_labels = [label for label, _ in train_docs]
     train_tokens = [tokens for _, tokens in train_docs]
@@ -80,8 +80,10 @@ def sentiment_analyzer(train_docs, test_docs):
     # Cosine similarity, k-nearest neighbors
     return [knn(train_vectors, v, k) for v in test_vectors]
 
-# Finding optimal k
+# print(sentiment_analyzer(train_docs, test_docs))
+
 '''
+# Finding optimal k
 def evaluate_predictions(predictions, test_docs):
     test = [label for label, _ in test_docs]
     pred = [label for label, _ in predictions]
@@ -94,9 +96,87 @@ def evaluate_predictions(predictions, test_docs):
 train_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_trn.tsv")
 test_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_dev.tsv")
 
-for k in range(20,41):
+predictions = sentiment_analyzer(train_docs, test_docs)
+accuracy = evaluate_predictions(predictions, test_docs)
+print(accuracy)
+
+for k in range(161, 181):
     predictions = sentiment_analyzer(train_docs, test_docs, k=k)
     accuracy = evaluate_predictions(predictions, test_docs)
     print(f"k={k}: accuracy={accuracy:.4f}")
+'''
 
+from string import punctuation
+
+def cosine_similarity_extra(v1: SparseVector, v2: SparseVector) -> float:
+    n = sum(v * v2.get(k, 0) for k, v in v1.items())
+    d1 = math.sqrt(sum(v ** 2 for v in v1.values()))
+    d2 = math.sqrt(sum(v ** 2 for v in v2.values()))
+
+    if d1 == 0 or d2 == 0:
+        return 0.0
+
+    return n / (d1 * d2)
+
+def knn_extra(trn_vs: list[tuple[int, SparseVector]], v: SparseVector, k: int = 1) -> tuple[int, float]:
+    sims = [(label, cosine_similarity_extra(v, t)) for label, t in trn_vs]
+    sims.sort(key=lambda x: x[1], reverse=True)
+    predicted_label = Counter(label for label, _ in sims[:k]).most_common(1)[0][0]
+    top_sim = sims[0][1]
+
+    return predicted_label, top_sim
+
+def sentiment_analyzer_extra(train_docs: list[tuple[int,Document]], test_docs: list[tuple[int,Document]], k) -> list[tuple[int,float]]:
+
+    #k = 117 # accuracy: 0.4042
+
+    # Add stopwords
+    stopwords = {line.strip().lower() for line in open('/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/stopwords.txt')}
+    is_stopwords = lambda w: w.lower() in stopwords or w in punctuation
+
+    # Bigram
+    def bigram(document: Document) -> Document:
+        bigrams = [f"{document[i - 1]} {document[i]}" for i in range(1, len(document))]
+        return document + bigrams
+
+    # Tokenizer
+    def tokenize(document: Document) -> Document:
+        tokens = []
+
+        for token in document:
+            token = token.lower()
+            token = ''.join(c for c in token if c.isalnum())
+            if token and not is_stopwords(token):
+                tokens.append(token)
+
+        return bigram(tokens)
+
+    train_labels = [label for label, _ in train_docs]
+    train_tokens = [tokenize(tokens) for _, tokens in train_docs]
+    test_tokens = [tokenize(tokens) for _, tokens in test_docs]
+
+    # Training vocab
+    vocab = vocabulary(train_tokens)
+
+    # Bag of words, document frequency
+    frequencies = document_frequencies(vocab, train_tokens)
+    D = len(train_tokens)  # total number of training docs
+
+    # TF-IDF
+    train_vectors = [(label, tf_idf(vocab, frequencies, D, doc)) for label, doc in zip(train_labels, train_tokens)]
+    test_vectors = [tf_idf(vocab, frequencies, D, doc) for doc in test_tokens]
+
+    # Cosine similarity, k-nearest neighbors
+    return [knn_extra(train_vectors, v, k) for v in test_vectors]
+
+'''
+# Evaluate improved sentiment analyzer
+
+train_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_trn.tsv")
+test_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_dev.tsv")
+
+for k in range(116,119):
+    predictions = sentiment_analyzer_extra(train_docs, test_docs, k=k)
+    accuracy = evaluate_predictions(predictions, test_docs)
+    print(f"k={k}: accuracy={accuracy:.4f}")
 '''
