@@ -47,4 +47,4 @@ def document_similarity(embeddings: dict[str, np.array], doc1: str, doc2: str) -
 # Test for task 3
 # print(document_similarity(embeddings, 'I love Friday', 'I love Saturday'))
 # print(document_similarity(embeddings, 'I love soda', 'I love sugar'))
-# print(document_similarity(embeddings, 'I hate baseball', 'I love sugar'))
+# print(document_similarity(embeddings, 'I hate baseball', 'I love muffins'))
