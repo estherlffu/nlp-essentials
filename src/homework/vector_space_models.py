@@ -2,6 +2,10 @@ from typing import TypeAlias
 import math
 from collections import Counter
 
+# Bag of words
+Document: TypeAlias = list[str]
+Vocab: TypeAlias = dict[str,int]
+
 # Load data
 def load_data(filepath: str) -> list[tuple[int,Document]]:
     docs = []
@@ -14,10 +18,6 @@ def load_data(filepath: str) -> list[tuple[int,Document]]:
             tokens = text.split()
             docs.append((int(label), tokens))
     return docs
-
-# Bag of words
-Document: TypeAlias = list[str]
-Vocab: TypeAlias = dict[str,int]
 
 def vocabulary(documents: list[Document]) -> Vocab:
     vocab = set()
@@ -80,7 +80,21 @@ def sentiment_analyzer(train_docs, test_docs):
     # Cosine similarity, k-nearest neighbors
     return [knn(train_vectors, v, k) for v in test_vectors]
 
-# print(sentiment_analyzer(train_docs, test_docs))
+train_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_trn.tsv")
+test_docs = load_data("/Users/esther/Documents/Emory/Classes/2026 Spring/cs329/nlp-essentials/dat/sst_dev.tsv")
+
+def evaluate_predictions(predictions, test_docs):
+    test = [label for label, _ in test_docs]
+    pred = [label for label, _ in predictions]
+
+    correct = sum(g == p for g, p in zip(test, pred))
+    accuracy = correct / len(test)
+
+    return accuracy
+
+predictions = sentiment_analyzer(train_docs, test_docs)
+accuracy = evaluate_predictions(predictions, test_docs)
+print(accuracy)
 
 '''
 # Finding optimal k
